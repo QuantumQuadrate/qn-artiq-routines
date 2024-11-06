@@ -76,6 +76,14 @@ class XYPlot(pyqtgraph.PlotWidget):
                         loading_fraction = n_atoms_loaded / measurements
                         loading_rate_array[i] = loading_fraction
                         retention_fraction = 0 if not n_atoms_loaded > 0 else sum(atoms_retained) / n_atoms_loaded
+
+                        if retention_fraction > 0.3:
+                            cutoff = threshold_otsu(shot2)
+                            atoms_retained = [x > cutoff and y for x, y in zip(shot2, atoms_loaded)]
+                            loading_fraction = n_atoms_loaded / measurements
+                            loading_rate_array[i] = loading_fraction
+                            retention_fraction = 0 if not n_atoms_loaded > 0 else sum(atoms_retained) / n_atoms_loaded
+
                         retention_array[i] = retention_fraction
 
                     error = np.array([1/np.sqrt(n) if n > 0 else 0 for n in n_atoms_loaded_array])
