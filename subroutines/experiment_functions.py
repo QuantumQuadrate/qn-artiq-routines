@@ -506,7 +506,6 @@ def chopped_optical_pumping(self):
         delay(self.t_depumping)
 
         self.dds_D1_pumping_DP.sw.off()
-        self.dds_pumping_repump.sw.off()
 
     delay(2*us)
     self.dds_AOM_A1.sw.off()
@@ -515,6 +514,7 @@ def chopped_optical_pumping(self):
     self.dds_AOM_A4.sw.off()
     self.dds_AOM_A5.sw.off()
     self.dds_AOM_A6.sw.off()
+    self.dds_pumping_repump.sw.off()
 
     delay(1*ms)
     self.dds_excitation.sw.off()
@@ -874,10 +874,6 @@ def microwave_Rabi_experiment(self):
             [self.AZ_bottom_volts_RO, self.AZ_top_volts_RO, self.AX_volts_RO, self.AY_volts_RO],
             channels=self.coil_channels)
 
-        # set the FORT AOM to the readout settings
-        self.dds_FORT.set(frequency=self.f_FORT,
-                          amplitude=self.stabilizer_FORT.amplitudes[1])
-
         # set the cooling DP AOM to the readout settings
         self.dds_cooling_DP.set(frequency=self.f_cooling_DP_RO,
                                 amplitude=self.ampl_cooling_DP_MOT * self.p_cooling_DP_RO)
@@ -906,17 +902,11 @@ def microwave_Rabi_experiment(self):
         if self.t_microwave_pulse > 0.0:
             # self.ttl_repump_switch.on()  # turns off the RP AOM
 
-            # todo: set coils for microwaves. good for diagnostics-- we can use this phase to zero the B-field
             self.zotino0.set_dac(
                 [self.AZ_bottom_volts_OP, self.AZ_top_volts_OP,
                  self.AX_volts_OP, self.AY_volts_OP],
                 channels=self.coil_channels)
             delay(0.1*ms)
-            # self.zotino0.set_dac(
-            #     [self.AZ_bottom_volts_microwave, self.AZ_top_volts_microwave,
-            #      self.AX_volts_microwave, self.AY_volts_microwave],
-            #     channels=self.coil_channels)
-            # delay(0.1*ms)
 
             self.ttl7.pulse(self.t_exp_trigger)  # in case we want to look at signals on an oscilloscope
 
@@ -932,10 +922,6 @@ def microwave_Rabi_experiment(self):
 
         if self.t_blowaway > 0.0:
             chopped_blow_away(self)
-
-        # set the FORT AOM to the readout settings
-        self.dds_FORT.set(frequency=self.f_FORT,
-                          amplitude=self.stabilizer_FORT.amplitudes[1])
 
         # take the second shot
         self.zotino0.set_dac(
